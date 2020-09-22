@@ -3,6 +3,8 @@ package vault
 import "github.com/hashicorp/vault/api"
 
 // LogicalClient represents a vault/api.Logical client.
+//
+// See https://github.com/hashicorp/vault/blob/master/api/logical.go#L41.
 type LogicalClient interface {
 	Read(path string) (*api.Secret, error)
 	ReadWithData(path string, data map[string][]string) (*api.Secret, error)
