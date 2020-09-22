@@ -2,6 +2,8 @@ package vault
 
 import "github.com/hashicorp/vault/api"
 
+//go:generate mockgen -destination=vaultmock/logical_client.go -package=vaultmock -mock_names=LogicalClient=LogicalClient github.com/mwalto7/vault LogicalClient
+
 // LogicalClient represents a vault/api.Logical client.
 //
 // See https://github.com/hashicorp/vault/blob/master/api/logical.go#L41.

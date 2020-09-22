@@ -3,3 +3,5 @@ repos:
     rev: v1.31.0
     hooks:
       - id: golangci-lint
+        args:
+          - "--skip-dirs=vault/mock"
