@@ -19,6 +19,7 @@ package cubbyhole
 
 import (
 	"errors"
+	"os"
 	"path"
 
 	"github.com/hashicorp/vault/api"
@@ -27,6 +28,14 @@ import (
 )
 
 const defaultMountPath = "/cubbyhole"
+
+var (
+	// ErrEmptyPath is returned when the secret path is an empty string.
+	ErrEmptyPath = errors.New("cubbyhole: path is empty")
+
+	// ErrNoSecretData is returned when no data is stored at the secret path.
+	ErrNoSecretData = errors.New("cubbyhole: no secret data")
+)
 
 // DefaultClient is a Cubbyhole API client mounted at the default path in Vault.
 var DefaultClient = NewClient(defaultMountPath, nil)
@@ -90,7 +99,7 @@ func (c *Client) ReadSecret(path string) (map[string]interface{}, error) {
 		return nil, err
 	}
 	if secret == nil || len(secret.Data) == 0 {
-		return nil, nil
+		return nil, &os.PathError{Op: "ReadSecret", Path: path, Err: ErrNoSecretData}
 	}
 	return secret.Data, nil
 }
@@ -112,7 +121,7 @@ func (c *Client) ListSecrets(path string) ([]string, error) {
 		return nil, err
 	}
 	if secret == nil || len(secret.Data) == 0 {
-		return nil, nil
+		return nil, &os.PathError{Op: "ListSecrets", Path: path, Err: ErrNoSecretData}
 	}
 	var aux struct {
 		Keys []string `mapstructure:"keys"`
@@ -159,7 +168,7 @@ var pathJoin = path.Join
 
 func (c *Client) secretPath(path string) (string, error) {
 	if path == "" {
-		return "", errors.New("vault: secret path is empty")
+		return "", ErrEmptyPath
 	}
 	if c.mountPath == "" {
 		c.mountPath = defaultMountPath
